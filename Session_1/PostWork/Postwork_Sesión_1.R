@@ -23,3 +23,8 @@ data$FTHG
 
 "Goles anotados por los equipos que jugaron como visitante"
 data$FTAG
+
+((data$FTHG)/dim(data)[1])
+(table(data$FTHG)/dim(data)[1])*100
+
+# 1 gol -> (1 / (380 filas)) * 100 
