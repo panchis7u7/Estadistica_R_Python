@@ -1,0 +1,38 @@
+---
+title: "PostWork_7"
+author: 
+  - "Viridiana Escarzaga Solis"
+  - "Carlos Sebastián Madrigal Rodríguez"
+  - "Diego Armando Morales Corona"
+  - "Carlos Rodríguez Tenorio"
+date: "12 de enero de 2021"
+output: 
+  prettydoc::html_pretty:
+    theme: tactile
+    highlight: github
+---
+
+```{r, echo=FALSE}
+htmltools::img(src = knitr::image_uri(file.path('E:/Postwork BEDU/PostWork 7/BEDU.jpeg')), 
+               alt = 'logo', 
+               style = 'position:absolute; top:0; right:0; padding:10px;')
+```
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+```
+
+
+```{r message=FALSE, warning=FALSE, comment= ' '}
+
+library(prettydoc)
+```
+
+{r message=FALSE, warning=FALSE, comment= ' '}
+
+- message=FALSE, warning=FALSE  ## Quita los mensajes y warnings que puede generar el código
+- comment= ' '  ## Quita los "##" que se generan en el html resultantes de los cÃ³digos.
+- echo = FALSE  ## Omite el código y solo presenta resultados de estÃ©.
+- eval = FALSE  ## Solo muestra el código pero no lo evalua. 
