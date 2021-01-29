@@ -12,27 +12,99 @@ output:
     highlight: github
 ---
 
+<style>
+body {
+text-align: justify}
+</style>
+
+```{r, include=FALSE}
+#Windows:
+#```{r, echo=FALSE}
+#htmltools::img(src = knitr::image_uri(file.path('E:/EstadisticaRP/Sesion_7/PostWork7/BEDU.jpeg')), 
+#               alt = 'logo', 
+#               style = 'position:absolute; top:0; right:0; padding:10px;')
+#```
+```
+
 ```{r, echo=FALSE}
-htmltools::img(src = knitr::image_uri(file.path('E:/Postwork BEDU/PostWork 7/BEDU.jpeg')), 
+#Linux
+htmltools::img(src = knitr::image_uri(file.path('/media/panchis/ExtraHDD/EstadisticaRP/Sesion_7/PostWork7/BEDU.jpeg')), 
                alt = 'logo', 
                style = 'position:absolute; top:0; right:0; padding:10px;')
 ```
 
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(knitr)
-```
-
-
-```{r message=FALSE, warning=FALSE, comment= ' '}
-
 library(prettydoc)
+library(mongolite)
 ```
 
-{r message=FALSE, warning=FALSE, comment= ' '}
+**MongoDB es una base de datos de documentos que ofrece una gran escalabilidad y flexibilidad, y un modelo de consultas e indexación avanzado. Existen 3 conectores de mongo para R, los cuales son:**
 
-- message=FALSE, warning=FALSE  ## Quita los mensajes y warnings que puede generar el código
-- comment= ' '  ## Quita los "##" que se generan en el html resultantes de los cÃ³digos.
-- echo = FALSE  ## Omite el código y solo presenta resultados de estÃ©.
-- eval = FALSE  ## Solo muestra el código pero no lo evalua. 
+* mongolite: este es un cliente MongoDB rápido y muy simple para la programación en R. Está basado en            mongo-c-driver y jsonlite. Tiene varias funcionalidades como indexación, cifrado, Map-Reduce, agregación,      streaming, etc.
+* RMongo: esta es una interfaz de base de datos MongoDB fácil de usar para R. La interfaz se proporciona a       través de llamadas Java al controlador mongo-java-driver.
+* rmongodb: este es un paquete muy poderoso para interactuar con MongoDB. Proporciona funcionalidades como       consultar, insertar y actualizar a MongoDB con JSON y BSON, manejar objetos BSON, crear índices en             colecciones MongoDB, canalizaciones de agregación, etc.
+
+Antes de proceder con la instalacion de mongolite, se debe de instalar la libreria libsasl:
+```{r message=FALSE, warning=FALSE, comment=' ', eval=FALSE}
+  sudo apt-get install libsasl2-dev
+```
+
+Mongolite se puede instalar directamente desde CRAN para el sistema operativo Windows, se instala sin generar mensajes ni advertencias de la siguiente manera:
+
+```{r message=FALSE, warning=FALSE, comment=' ', eval=FALSE}
+  suppressMessages(suppressWarnings(install.packages("mongolite", dependencies = TRUE)))
+```
+
+
+Se necesita configurar un servidor local para MongoDB. Una vez que el paquete mongolite esté instalado, cárguelo usando el siguiente comando:
+
+```{r message=FALSE, warning=FALSE, comment=' ', eval=FALSE}
+  suppressMessages(suppressWarnings(library(mongolite)))
+```
+
+A partir del conjunto de datos proporcinado en datos.csv, se importara y analizara para conocer el contenido de este archivo. Primero se cambia el 'Working directory' a la ubicacion en donde tenemos el conjunto de datos guardados, posteriormente se guarda en un data frame y se imprime las primeras filas para conocer mas sobre la integridad de los datos del archivo.
+
+```{r message=FALSE, warning=FALSE, comment=' ', eval=TRUE}
+  setwd("/media/panchis/ExtraHDD/EstadisticaRP/Sesion_7/PostWork7/")
+  data <- read.csv('data.csv')
+  head(data)
+```
+
+Una vez analizado los datos, se crea una base de datos llamada 'match_games' con una coleccion llamada 'match'.
+
+![Creacion de nueva DB y Coleccion.](/media/panchis/ExtraHDD/EstadisticaRP/Sesion_7/PostWork7/Mongo_Create.png){#id .class width=100% height=100%}
+
+La función mongo () se conecta a un servidor MongoDB. Los parámetros de la función son:
+```{r message=FALSE, warning=FALSE, comment=' ', eval=FALSE}
+  mongo(coleccion, Base de datos)
+```
+
+Por ende, la conexion a mongo se efectuara con:
+```{r message=FALSE, warning=FALSE, comment=' ', eval=TRUE}
+  coleccion = mongo("match", "match_games")
+```
+
+Ya generada la base de datos y la coleccion, se procede a alojar el fichero data.csv, Para lograr esto utilizaremos la funcion 'fread'.
+
+```{r message=FALSE, warning=FALSE, comment=' ', eval=TRUE}
+  coleccion$insert(data)
+```
+
+Una vez hecho esto, realizar un count para conocer el número de registros que se tiene en la base de datos.
+```{r message=FALSE, warning=FALSE, comment=' ', eval=TRUE}
+  coleccion$count()
+```
+
+Ya generada la cuenta y haber probado que los datos se hayan insertado satisfactoriamente, se realiza una consulta utilizando la sintaxis de Mongodb, en la base de datos para conocer el número de goles que metió el Real Madrid el 20 de diciembre de 2015 y contra que equipo jugó, ¿perdió ó fue goleada?
+
+```{r, message=FALSE, warning=FALSE, comment=' ', eval=TRUE}
+  coleccion$find('{"Date":"2017-12-20", "HomeTeam":"Real Madrid"}')
+```
+
+Ya habiendo hecho la consulta, debemos de cerrar la conexion con la base de datos.
+
+```{r, message=FALSE, warning=FALSE, comment=' ', eval=TRUE}
+  rm(coleccion)
+```
