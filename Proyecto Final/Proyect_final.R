@@ -3,10 +3,13 @@
 
 install.packages("ggplot2")
 install.packages("tidyr")
+install.packages("forecast")
+
 
 suppressWarnings(suppressMessages(library(tidyr)))
 suppressWarnings(suppressMessages(library(dplyr)))
 suppressWarnings(suppressMessages(library(ggplot2)))
+suppressWarnings(suppressMessages(library(forecast)))
 
 ################################################################################
 
@@ -40,13 +43,14 @@ head(df, 3)
 #Separamos los datos de la companias mas "Influyentes".
 list_of_values <- c("CLARO", "MOVISTAR", "UNE", "DIRECTV")
 filtered <- filter(datos, Proveedor %in% list_of_values)
+movistar <- filter(datos, Proveedor == "MOVISTAR")
 
 ################################################################################
 
 ################################################################################
                               #Grafica de Areas.
 
-ggplot(datos, aes(x = Fecha, y = Trafico_Datos_Local)) +
+ggplot(filtered, aes(x = Fecha, y = Trafico_Datos_Local)) +
   geom_area(aes(color = Proveedor, fill = Proveedor),
   alpha = 0.5, position=position_dodge(0.8)) +
   ggtitle("Trafico de datos durante la pandemia") +
@@ -88,5 +92,26 @@ ggplot(filtered, aes(x = Fecha, y = Trafico_Datos_Local)) +
   ylab("Datos en GB") +
   scale_color_manual(values=c("#00AFBB", "#E7B800","#CC0000", "#006600")) +
   theme_minimal()
+
+################################################################################
+
+################################################################################
+
+#Calculamos el componente estacional del uso de datos stl(). 
+#Hallamos el componente estacional de la serie mediante suavizado y 
+#ajusta la serie original restando la estacionalidad.
+
+count_ma = ts(movistar$Trafico_Datos_Local, frequency=30)
+decomp = stl(count_ma, s.window="periodic")
+deseasonal_apartamento <- seasadj(decomp)
+plot(decomp)
+
+
+acf(movistar$Trafico_Datos_Local, prob = T, ylab = "", xlab = "", main = "")
+pacf(movistar$Trafico_Datos_Local, main='PACF for Differenced Series')
+modelo_arima <- auto.arima(movistar$Trafico_Datos_Local, seasonal=TRUE)
+tsdisplay(residuals(modelo_arima), lag.max=10, main='(2,0,0) Model Residuals')
+prediccion <- forecast(modelo_arima, h=30)
+plot(prediccion)
 
 ################################################################################
