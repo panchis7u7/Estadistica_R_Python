@@ -4,12 +4,13 @@
 install.packages("ggplot2")
 install.packages("tidyr")
 install.packages("forecast")
-
+install.packages("plotly")
 
 suppressWarnings(suppressMessages(library(tidyr)))
 suppressWarnings(suppressMessages(library(dplyr)))
 suppressWarnings(suppressMessages(library(ggplot2)))
 suppressWarnings(suppressMessages(library(forecast)))
+suppressWarnings(suppressMessages(library(plotly)))
 
 ################################################################################
 
@@ -94,6 +95,15 @@ ggplot(filtered, aes(x = Fecha, y = Trafico_Datos_Local)) +
   theme_minimal()
 
 ################################################################################
+
+grafica <- ggplot(movistar) +
+  geom_line(aes(x=Fecha, y= Trafico_Datos_Local), color="green", size=0.8) +
+  geom_point(aes(x=Fecha, y= Trafico_Datos_Local), size=1) +
+  ggtitle("Movistar") +
+  labs(x="Tiempo", y="Datos (GB)") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5))
+ggplotly(grafica)
 
 ################################################################################
 
