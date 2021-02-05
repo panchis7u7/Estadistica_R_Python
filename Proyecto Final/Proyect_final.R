@@ -20,7 +20,7 @@ setwd("/media/panchis/ExtraHDD/EstadisticaRP/Proyecto Final/Datos")
 getwd()
 
 #importar datos.
-datos <- read.csv("Monitoreo de Tráfico de Internet.csv", header = TRUE, 
+datos <- read.csv("Monitoreo de Tráfico de Internet_2.csv", header = TRUE, 
                   sep = ",", check.names = FALSE)
 
 #Inspeccionar datos.
@@ -203,6 +203,8 @@ subplot(p1,p2,p3,p4,nrows = 2, margin = 0.07, titleX = T, titleY = T)
 #ajusta la serie original restando la estacionalidad.
 
 #Prediccion movistar
+#Los datos atipicos mas observables se normalizaron (7, 24 y el 31 de diciembre)
+#por el promedio del dia anterior con el dia posterior.
 count_ma_movistar = ts(movistar$Trafico_Datos_Local, frequency=30)
 decomp_movistar = stl(count_ma_movistar, s.window="periodic")
 deseasonal <- seasadj(decomp_movistar)
@@ -213,9 +215,11 @@ pacf(movistar$Trafico_Datos_Local, main='PACF for Differenced Series')
 modelo_arima_movistar <- auto.arima(movistar$Trafico_Datos_Local, seasonal=TRUE)
 tsdisplay(residuals(modelo_arima_movistar), lag.max=10, main='(2,0,0) Model Residuals')
 prediccion_movistar <- forecast(modelo_arima_movistar, h=30)
-plot1 <- plot(prediccion_movistar)
 
 #Prediccion claro
+#Los datos atipicos mas observables se normalizaron 
+#19 de mayo, 11 de junio, 27 de agosto(pico mayor), 13 y 30 de octubre
+#(7, 24 y el 31 de diciembre) por el promedio del dia anterior con el dia posterior.
 count_ma_claro = ts(claro$Trafico_Datos_Local, frequency=30)
 decomp_claro = stl(count_ma_claro, s.window="periodic")
 deseasonal <- seasadj(decomp_claro)
@@ -227,9 +231,10 @@ pacf(claro$Trafico_Datos_Local, main='PACF for Differenced Series')
 modelo_arima_claro <- auto.arima(claro$Trafico_Datos_Local, seasonal=TRUE)
 tsdisplay(residuals(modelo_arima_claro), lag.max=10, main='(2,0,0) Model Residuals')
 prediccion_claro <- forecast(modelo_arima_claro, h=30)
-plot2 <- plot(prediccion_claro)
 
 #Prediccion unefon
+#Los datos atipicos mas observables se normalizaron (17, 24 y el 31 de diciembre)
+#por el promedio del dia anterior con el dia posterior.
 count_ma_unefon = ts(une$Trafico_Datos_Local, frequency=30)
 decomp_unefon = stl(count_ma_unefon, s.window="periodic")
 deseasonal <- seasadj(decomp_unefon)
@@ -241,9 +246,11 @@ pacf(une$Trafico_Datos_Local, main='PACF for Differenced Series')
 modelo_arima_unefon <- auto.arima(une$Trafico_Datos_Local, seasonal=TRUE)
 tsdisplay(residuals(modelo_arima_unefon), lag.max=10, main='(2,0,0) Model Residuals')
 prediccion_unefon <- forecast(modelo_arima_unefon, h=30)
-plot3 <- plot(prediccion_unefon)
 
 #Prediccion directv
+#Prediccion claro
+#Los datos atipicos mas observables se normalizaron el 26 de octubre,
+#(31 de diciembre, 7 de enero por el promedio del dia anterior con el dia posterior.
 count_ma_directv = ts(directv$Trafico_Datos_Local, frequency=30)
 decomp_directv = stl(count_ma_directv, s.window="periodic")
 deseasonal <- seasadj(decomp_directv)
@@ -254,7 +261,11 @@ acf(directv$Trafico_Datos_Local, prob = T, ylab = "", xlab = "", main = "")
 pacf(directv$Trafico_Datos_Local, main='PACF for Differenced Series')
 modelo_arima_directv <- auto.arima(directv$Trafico_Datos_Local, seasonal=TRUE)
 tsdisplay(residuals(modelo_arima_directv), lag.max=10, main='(2,0,0) Model Residuals')
-prediccion_directv <- forecast(modelo_arima_directv, h=30)
-plot4 <- plot(prediccion_directv)
+prediccion_directv <- forecast(modelo_arima_directv, h=20)
 
+par(mfrow=c(2,2))
+plot(prediccion_movistar, main = "Movistar ARIMA", xlab="Tiempo", ylab = "Datos (GB)")
+plot(prediccion_claro, main = "Clarovideo ARIMA", xlab="Tiempo", ylab = "Datos (GB)")
+plot(prediccion_unefon, main = "Unefon ARIMA", xlab="Tiempo", ylab = "Datos (GB)")
+plot(prediccion_directv, main = "Directv ARIMA", xlab="Tiempo", ylab = "Datos (GB)")
 ################################################################################
