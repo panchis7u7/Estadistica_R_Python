@@ -40,9 +40,9 @@ Tras el brote de la COVID-19, cada vez más personas trabajan, estudian y social
 
 La información de trafico diario reportado por los Proveedores de Servicio de Internet, fue recopilada desde el 30 de marzo del 2020 hasta el 26 de enero del 2021. [(Obtenidos aqui)](https://www.postdata.gov.co/dataset/tr%C3%A1fico-de-internet-covid-19/resource/c9d5111e-d303-4d7e-8df1-a8f0766ba439#{})
 
-La base de datos proporcionada, nos brinda la cantidad de datos (en GB) que circulan a traves de distintos proveedores de servicios digitales por medio de su infraestructura de red. Este dataset contempla distintos provedores que pueden presentar correlacion entre ellos, por lo cual podrian ser omitidos para evitar estudiar informacion muy parecida en las series.
+La base de datos proporcionada, nos brinda la cantidad de datos (en GB) que circulan a traves de distintos proveedores de servicios digitales por medio de su infraestructura de red. Este dataset contempla distintos provedores que presentan comportamientos identicos a lo largo e la pandemia, por lo cual podrian ser omitidos para evitar estudiar informacion muy parecida en las series.
 
-```{r message=FALSE, warning=FALSE, comment=' ', eval=TRUE}
+```{r message=FALSE, warning=FALSE, comment=' ', eval=TRUE, echo=FALSE}
   #Lectura de los datos del archivo csv.
   datos_internet <- read.csv("Monitoreo de Tráfico de Internet_2.csv", header = TRUE,
                   sep = ",", check.names = FALSE)
