@@ -1,0 +1,115 @@
+---
+title: "Trafico de datos en tiempo de SARS-COV-II"
+author: "Carlos Sebastian Madrigal Rodriguez"
+date: "2/7/2021"
+output: 
+  prettydoc::html_pretty:
+    theme: tactile
+    highlight: github
+---
+
+<style>
+body {
+  text-align: justify;
+  width: 100%;
+}
+</style>
+
+```{r, echo=FALSE}
+#Linux
+htmltools::img(src = knitr::image_uri(file.path('/media/panchis/ExtraHDD/EstadisticaRP/Sesion_7/PostWork7/BEDU.jpeg')), 
+               alt = 'logo', 
+               style = 'position:absolute; top:0; right:0; padding:10px;')
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = '/media/panchis/ExtraHDD/EstadisticaRP/Proyecto Final/Datos')
+library(knitr)
+library(prettydoc)
+library(dplyr)
+library(ggplot2)
+library(plotly)
+library(forecast)
+```
+
+Tras el brote de la COVID-19, cada vez más personas trabajan, estudian y socializan desde sus casas. A lo largo de la cadena de valor de Internet, los operadores de comunicaciones, los proveedores de contenido y servicios en la nube, así como también los puntos de intercambio de Internet (IXP), han experimentado hasta un 60% más de tráfico de Internet en comparación con el tráfico previo al brote. En esta situación sin precedentes, la resiliencia y la capacidad de las redes de banda ancha se han vuelto aún más esenciales. [consulte mas aqui](https://asiet.lat/magazine-digital/como-la-covid-19-afecto-el-trafico-de-internet-y-que-aprendimos-hasta-ahora/)
+
+La base de datos proporcionada, nos brinda la cantidad de datos (en GB) que circulan a traves de distintos proveedores de servicios digitales por medio de su infraestructura de red. Este dataset contempla distintos provedores que pueden presentar correlacion entre ellos, por lo cual podrian ser omitidos para evitar estudiar informacion muy parecida en las series.
+
+```{r message=FALSE, warning=FALSE, comment=' ', eval=TRUE}
+  #Lectura de los datos del archivo csv.
+  datos_internet <- read.csv("Monitoreo de Tráfico de Internet_2.csv", header = TRUE,
+                  sep = ",", check.names = FALSE)
+  datos_internet <- datos_internet %>% select(Fecha, Proveedor, Trafico_Datos_Local)
+  datos_internet <- mutate(datos_internet, Fecha = as.Date(Fecha, "%m/%d/%Y"), 
+                           Trafico_Datos_Local = as.numeric(Trafico_Datos_Local))
+```
+
+De todos los proveedores, seleccionaremos a los 3 que mas datos generan de manera local asi como 1 de los que menos generan.
+
+```{r message=FALSE, warning=FALSE, comment=' ', eval=TRUE, fig.asp = 0.6, fig.width=10}
+  #Grafica de area.
+  ggplot(datos_internet, aes(x = Fecha, y = Trafico_Datos_Local)) +
+  geom_area(aes(color = Proveedor, fill = Proveedor),
+  alpha = 0.5, position=position_dodge(0.8)) +
+  ggtitle("Trafico de datos durante la pandemia") +
+  xlab("Mes 2020") +
+  ylab("Datos en GB") +
+  theme_minimal() +
+  scale_color_manual(values=c("#00AFBB", "#E7B800", "#CC0000", "#006600", 
+                              "#669999", "#00CCCC", "#660099", "#FC0066", 
+                              "#AF9999", "#FE99FF", "#559955", "#A990CC", 
+                              "#660099", "#CC0066")) +
+  scale_fill_manual(values=c( "#00AFBB", "#E7B800", "#CC0000", "#006600", 
+                              "#669999", "#00CCCC", "#660099", "#FC0066", 
+                              "#AF9999", "#FE99FF", "#559955", "#A990CC", 
+                              "#660099", "#CC0066"))
+```
+
+En este caso fueron seleccionados: Movistar, Unefon, Clarovideo y DirecTV.
+```{r message=FALSE, warning=FALSE, comment=' ', eval=TRUE, echo=FALSE}
+  #Separacion de los proveedores seleccionados en data frames unicos.
+  movistar <- filter(datos_internet, Proveedor == "MOVISTAR")
+  claro <- filter(datos_internet, Proveedor == "CLARO")
+  une <- filter(datos_internet, Proveedor == "UNE")
+  directv <- filter(datos_internet, Proveedor == "DIRECTV")
+```
+
+```{r message=FALSE, warning=FALSE, comment=' ', eval=TRUE, fig.asp = 0.6, fig.width=8, out.width = "100%"}
+grafica_movi <- ggplot(movistar) +
+  geom_line(aes(x=Fecha, y= Trafico_Datos_Local), color="green", size=0.8) +
+  geom_point(aes(x=Fecha, y= Trafico_Datos_Local), size=1) +
+  ggtitle("Movistar") +
+  labs(x="Tiempo", y="Datos (GB)") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5))
+ggplotly(grafica_movi)
+
+grafica_une <- ggplot(une) +
+  geom_line(aes(x=Fecha, y= Trafico_Datos_Local), color="yellow", size=0.8) +
+  geom_point(aes(x=Fecha, y= Trafico_Datos_Local), size=1) +
+  ggtitle("Unefon") +
+  labs(x="Tiempo", y="Datos (GB)") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5))
+ggplotly(grafica_une)
+
+grafica_claro <- ggplot(claro) +
+  geom_line(aes(x=Fecha, y= Trafico_Datos_Local), color="red", size=0.8) +
+  geom_point(aes(x=Fecha, y= Trafico_Datos_Local), size=1) +
+  ggtitle("Claro") +
+  labs(x="Tiempo", y="Datos (GB)") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5))
+ggplotly(grafica_claro)
+
+grafica_directv <- ggplot(directv) +
+  geom_line(aes(x=Fecha, y= Trafico_Datos_Local), color="blue", size=0.8) +
+  geom_point(aes(x=Fecha, y= Trafico_Datos_Local), size=1) +
+  ggtitle("Directv") +
+  labs(x="Tiempo", y="Datos (GB)") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5))
+ggplotly(grafica_directv)
+```
