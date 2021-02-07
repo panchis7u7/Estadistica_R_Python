@@ -32,8 +32,13 @@ library(ggplot2)
 library(plotly)
 library(forecast)
 ```
+### Introduccion.
+Tras el brote de la COVID-19, cada vez más personas trabajan, estudian y socializan desde sus casas. A lo largo de la cadena de valor de Internet, los operadores de comunicaciones, los proveedores de contenido y servicios en la nube, así como también los puntos de intercambio de Internet (IXP), han experimentado hasta un 60% más de tráfico de Internet en comparación con el tráfico previo al brote. En esta situación sin precedentes, la resiliencia y la capacidad de las redes de banda ancha se han vuelto aún más esenciales. [(consulte mas aqui)](https://asiet.lat/magazine-digital/como-la-covid-19-afecto-el-trafico-de-internet-y-que-aprendimos-hasta-ahora/)
 
-Tras el brote de la COVID-19, cada vez más personas trabajan, estudian y socializan desde sus casas. A lo largo de la cadena de valor de Internet, los operadores de comunicaciones, los proveedores de contenido y servicios en la nube, así como también los puntos de intercambio de Internet (IXP), han experimentado hasta un 60% más de tráfico de Internet en comparación con el tráfico previo al brote. En esta situación sin precedentes, la resiliencia y la capacidad de las redes de banda ancha se han vuelto aún más esenciales. [consulte mas aqui](https://asiet.lat/magazine-digital/como-la-covid-19-afecto-el-trafico-de-internet-y-que-aprendimos-hasta-ahora/)
+### Datos
+- El trafico diario de internet se extrajo del portal abierto de la comision de regulacion de comunicaciones del estado de colombia. Varios de los proveedores de servicios digitales son reconocidos y usados a lo largo de todo el continente americano. [(consulte mas aqui)](https://www.postdata.gov.co/)
+
+La información de trafico diario reportado por los Proveedores de Servicio de Internet, fue recopilada desde el 30 de marzo del 2020 hasta el 26 de enero del 2021. [(Obtenidos aqui)](https://www.postdata.gov.co/dataset/tr%C3%A1fico-de-internet-covid-19/resource/c9d5111e-d303-4d7e-8df1-a8f0766ba439#{})
 
 La base de datos proporcionada, nos brinda la cantidad de datos (en GB) que circulan a traves de distintos proveedores de servicios digitales por medio de su infraestructura de red. Este dataset contempla distintos provedores que pueden presentar correlacion entre ellos, por lo cual podrian ser omitidos para evitar estudiar informacion muy parecida en las series.
 
@@ -142,8 +147,9 @@ Como breve conclusion de las graficas anteriores, Ante el confinamiento, los ser
 ### Modelos y Predicciones.
 Es importante recordar que, al ajustar un modelo, los residuales de este deben comportarse como ruido blanco.
 
+Para las empresas a analizar (Movistar, Claro, Unefon y DirecTV), se realizaron series de tiempo, asi como uso de la la función auto.arima para ajustar el mejor modelo posible a los datos. Para comprobar son buenos modelos, se hizo el test Ljung-Box.
+
 ### Movistar.
-Para la empresa Movistar, se realizo una serie de tiempo, asi como uso de la la función auto.arima para ajustar el mejor modelo posible a los datos. Para comprobar que es un buen modelo, se hizo el test Ljung-Box.
 
 ```{r message=FALSE, warning=FALSE, comment=' ', eval=TRUE}
   ts_movistar = ts(movistar$Trafico_Datos_Local, start = c(2020,3,30),
@@ -159,12 +165,7 @@ Test Ljung-Box:
   Box.test(residuals(modelo_arima_movistar), type = 'Ljung-Box')
 ```
 
-Media de los residuales del modelo:
-```{r message=FALSE, warning=FALSE, comment=' ', eval=TRUE}
-  mean(na.omit(residuals(modelo_arima_movistar)))
-```
-
-Se puede observar que el ajuste arrojo un modelo ARIMA (2,1,2), con 2 componentes autorregresivos, 2 medias móviles y una diferencia, Sin embargo notamos que la prueba *Ljung-Box* obtuvo un p_value = 9.996e-06, lo cual nos indica por contraste de hipotesis que los residuales no se comportan como ruido blanco; por lo que el modelo no puede ser usado para predecir. Ademas de esto, la media de los residuales es de 218.09, mientras que idealmente este valor debe de aproximarse a cero.
+Se puede observar que el ajuste arrojo un modelo ARIMA (2,1,2), con 2 componentes autorregresivos, 2 medias móviles y una diferencia, Sin embargo notamos que la prueba *Ljung-Box* obtuvo un p_value = 9.996e-06, lo cual nos indica por contraste de hipotesis que los residuales no se comportan como ruido blanco; por lo que el modelo no puede ser usado para predecir.
 
 Para obtener un modelo que nos sirva para predicciones y para corregir la media de los residuales, usaremos medias móviles de orden 2 para suavizar la serie; ya evaluada la serie de tiempo, se logro obtener los siguientes resultados:
 
@@ -185,12 +186,7 @@ Test Ljung-Box para el modelo suavizado:
   Box.test(residuals(modelo_arima_movistar), type = 'Ljung-Box')
 ```
 
-Media de los residuales del modelo suavizado:
-```{r message=FALSE, warning=FALSE, comment=' ', eval=TRUE}
-  mean(na.omit(residuals(modelo_arima_movistar)))
-```
-
-Tras realizar estas modificaciones, el nuevo ajuste nos arrojo un modelo ARIMA(2,1,0) con 2 componentes autorregresivos, 0 medias móviles y una diferencia. Ahora tras realizar la prueba *Ljung-Box* se obtuvo un p_value = 0.6338, lo cual nos indica que los residuales se comportan como ruido blanco y es un modelo que se puede usar para realizar pronosticos. Ademas de esto, la media de los residuales se redujo considerablemente a un valor de 12.95.
+Tras realizar estas modificaciones, el nuevo ajuste nos arrojo un modelo ARIMA(2,1,0) con 2 componentes autorregresivos, 0 medias móviles y una diferencia. Ahora tras realizar la prueba *Ljung-Box* se obtuvo un p_value = 0.6338, lo cual nos indica que los residuales se comportan como ruido blanco y es un modelo que se puede usar para realizar pronosticos.
 
 Tras haber ajustado el modelo, se pudo obtener el siguiente pronostico:
 
@@ -200,8 +196,24 @@ Tras haber ajustado el modelo, se pudo obtener el siguiente pronostico:
   plot(prediccion_movistar, main="Pronostico para Movistar.")
 ```
 
-### Claro
-Para la empresa "Claro", al igual que la empresa anterior, se realizo una serie de tiempo, asi como uso de la función auto.arima para ajustar el mejor modelo posible a los datos. Para comprobar que es un buen modelo, se hizo el test de Ljung-Box.
+### Claro.
+
+```{r message=FALSE, warning=FALSE, comment=' ', eval=TRUE}
+  ts_claro = ts(claro$Trafico_Datos_Local, start = c(2020,3,30),
+              end = c(2021,1,26), frequency=305)
+  modelo_arima_claro <- auto.arima(ts_claro)
+  summary(modelo_arima_claro)
+```
+
+Test Ljung-Box:
+```{r message=FALSE, warning=FALSE, comment=' ', eval=TRUE}
+  #Ver si es un buen modelo.
+  Box.test(residuals(modelo_arima_claro), type = 'Ljung-Box')
+```
+
+Se puede observar que el ajuste arrojo un modelo ARIMA (3,1,2), con 3 componentes autorregresivos, 2 medias móviles y una diferencia, Sin embargo notamos que la prueba *Ljung-Box* obtuvo un p_value = 0.0868, lo cual nos indica que los residuales se comportan como ruido blanco. El problemas es que; para muchos níveles de significancia podría no ser un gran modelo. 
+
+Para obtener un modelo que nos sirva para predicciones y para corregir la media de los residuales, agregamos otra diferencia al modelo ARIMA; en base a esto, se logro obtener los siguientes resultados:
 
 ```{r message=FALSE, warning=FALSE, comment=' ', eval=TRUE}
   ts_claro = ts(claro$Trafico_Datos_Local, start = c(2020,3,30),
@@ -210,16 +222,23 @@ Para la empresa "Claro", al igual que la empresa anterior, se realizo una serie 
   summary(modelo_arima_claro)
 ```
 
+Test Ljung-Box para el modelo ajustado:
 ```{r message=FALSE, warning=FALSE, comment=' ', eval=TRUE}
   #Ver si es un buen modelo.
   Box.test(residuals(modelo_arima_claro), type = 'Ljung-Box')
 ```
+
+Tras realizar estas modificaciones, el nuevo ajuste nos arrojo un modelo ARIMA(3,2,2) con 2 componentes autorregresivos, 2 medias móviles y 2 diferencias. Ahora tras realizar la prueba *Ljung-Box* se obtuvo un p_value = 0.152, lo cual nos indica que los residuales se comportan como ruido blanco y es un modelo mejor que al anterior, pero indica que; para ciertos níveles de significancia más altos podría no ser un gran modelo.
+
+Tras haber ajustado el modelo, se pudo obtener el siguiente pronostico:
 
 ```{r message=FALSE, warning=FALSE, comment=' ', eval=TRUE, fig.asp = 0.6, fig.width=8, out.width = "100%"}
   #Ver si es un buen modelo.
   prediccion_claro <- forecast(modelo_arima_claro,10,level=95)
   plot(prediccion_claro, main="Pronostico para Claro")
 ```
+
+### Unefon.
 
 ```{r message=FALSE, warning=FALSE, comment=' ', eval=TRUE}
   ts_unefon = ts(une$Trafico_Datos_Local,start = c(2020,3,30),
@@ -228,16 +247,23 @@ Para la empresa "Claro", al igual que la empresa anterior, se realizo una serie 
   summary(modelo_arima_unefon)
 ```
 
+Test Ljung-Box:
 ```{r message=FALSE, warning=FALSE, comment=' ', eval=TRUE}
   #Ver si es un buen modelo.
   Box.test(residuals(modelo_arima_unefon), type = 'Ljung-Box')
 ```
+
+Se puede observar que el ajuste arrojo un modelo ARIMA (4,1,2), con 4 componentes autorregresivos, 2 medias móviles y una diferencia, Sin embargo notamos que la prueba Ljung-Box obtuvo un p_value = 0.5903, lo cual nos indica que los residuales se comportan como ruido blanco y es un buen modelo para generar predicciones.
+
+Tras el ajuste del modelo, se pudo obtener el siguiente pronostico:
 
 ```{r message=FALSE, warning=FALSE, comment=' ', eval=TRUE, fig.asp = 0.6, fig.width=8, out.width = "100%"}
   #Ver si es un buen modelo.
   prediccion_unefon <- forecast(modelo_arima_unefon, 12, level=95)
   plot(prediccion_unefon, main="Pronostico para Unefon")
 ```
+
+### DirecTV.
 
 ```{r message=FALSE, warning=FALSE, comment=' ', eval=TRUE}
   ts_directv = ts(directv$Trafico_Datos_Local, start = c(2020,3,30),
@@ -246,10 +272,15 @@ Para la empresa "Claro", al igual que la empresa anterior, se realizo una serie 
   summary(modelo_arima_directv)
 ```
 
+Test Ljung-Box:
 ```{r message=FALSE, warning=FALSE, comment=' ', eval=TRUE}
   #Ver si es un buen modelo.
   Box.test(residuals(modelo_arima_directv), type = 'Ljung-Box')
 ```
+
+Se puede observar que el ajuste arrojo un modelo ARIMA (2,1,2), con 2 componentes autorregresivos, 2 medias móviles y una diferencia, Sin embargo notamos que la prueba Ljung-Box obtuvo un p_value = 0.2161, lo cual nos indica que los residuales se comportan como ruido blanco; pero indica que; para ciertos níveles de significancia más altos podría no ser un gran modelo.
+
+Tras el ajuste del modelo, se pudo obtener el siguiente pronostico:
 
 ```{r message=FALSE, warning=FALSE, comment=' ', eval=TRUE, fig.asp = 0.6, fig.width=8, out.width = "100%"}
   #Ver si es un buen modelo.
