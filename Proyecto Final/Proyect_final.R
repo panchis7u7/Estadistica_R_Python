@@ -99,49 +99,41 @@ ggplot(filtered, aes(x = Fecha, y = Trafico_Datos_Local)) +
 
 ################################################################################
 
-# grafica_movi <- ggplot(movistar) +
-#   geom_line(aes(x=Fecha, y= Trafico_Datos_Local), color="green", size=0.8) +
-#   geom_point(aes(x=Fecha, y= Trafico_Datos_Local), size=1) +
-#   ggtitle("Movistar") +
-#   labs(x="Tiempo", y="Datos (GB)") +
-#   theme_bw() +
-#   theme(plot.title = element_text(hjust = 0.5))
-# grafica_plotly_movi <- ggplotly(grafica_movi)
-# 
-# grafica_une <- ggplot(une) +
-#   geom_line(aes(x=Fecha, y= Trafico_Datos_Local), color="green", size=0.8) +
-#   geom_point(aes(x=Fecha, y= Trafico_Datos_Local), size=1) +
-#   ggtitle("Unefon") +
-#   labs(x="Tiempo", y="Datos (GB)") +
-#   theme_bw() +
-#   theme(plot.title = element_text(hjust = 0.5))
-# grafica_plotly_une <- ggplotly(grafica_une)
-# 
-# grafica_claro <- ggplot(claro) +
-#   geom_line(aes(x=Fecha, y= Trafico_Datos_Local), color="green", size=0.8) +
-#   geom_point(aes(x=Fecha, y= Trafico_Datos_Local), size=1) +
-#   ggtitle("Claro") +
-#   labs(x="Tiempo", y="Datos (GB)") +
-#   theme_bw() +
-#   theme(plot.title = element_text(hjust = 0.5))
-# grafica_plotly_claro <- ggplotly(grafica_claro)
-# 
-# grafica_directv <- ggplot(directv) +
-#   geom_line(aes(x=Fecha, y= Trafico_Datos_Local), color="green", size=0.8) +
-#   geom_point(aes(x=Fecha, y= Trafico_Datos_Local), size=1) +
-#   ggtitle("Directv") +
-#   labs(x="Tiempo", y="Datos (GB)") +
-#   theme_bw() +
-#   theme(plot.title = element_text(hjust = 0.5))
-# grafica_plotly_directv <- ggplotly(grafica_directv)
-# 
-# plot_ly(directv) + 
-#   geom_line(aes(x=Fecha, y= Trafico_Datos_Local), color="green", size=0.8) +
-#   geom_point(aes(x=Fecha, y= Trafico_Datos_Local), size=1) +
-#   ggtitle("Directv") +
-#   labs(x="Tiempo", y="Datos (GB)") +
-#   theme_bw() +
-#   theme(plot.title = element_text(hjust = 0.5))
+grafica_movi <- ggplot(movistar) +
+  geom_line(aes(x=Fecha, y= Trafico_Datos_Local), color="green", size=0.8) +
+  geom_point(aes(x=Fecha, y= Trafico_Datos_Local), size=1) +
+  ggtitle("Movistar") +
+  labs(x="Tiempo", y="Datos (GB)") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5))
+ggplotly(grafica_movi)
+
+grafica_une <- ggplot(une) +
+  geom_line(aes(x=Fecha, y= Trafico_Datos_Local), color="green", size=0.8) +
+  geom_point(aes(x=Fecha, y= Trafico_Datos_Local), size=1) +
+  ggtitle("Unefon") +
+  labs(x="Tiempo", y="Datos (GB)") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5))
+ggplotly(grafica_une)
+
+grafica_claro <- ggplot(claro) +
+  geom_line(aes(x=Fecha, y= Trafico_Datos_Local), color="green", size=0.8) +
+  geom_point(aes(x=Fecha, y= Trafico_Datos_Local), size=1) +
+  ggtitle("Claro") +
+  labs(x="Tiempo", y="Datos (GB)") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5))
+ggplotly(grafica_claro)
+
+grafica_directv <- ggplot(directv) +
+  geom_line(aes(x=Fecha, y= Trafico_Datos_Local), color="green", size=0.8) +
+  geom_point(aes(x=Fecha, y= Trafico_Datos_Local), size=1) +
+  ggtitle("Directv") +
+  labs(x="Tiempo", y="Datos (GB)") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5))
+ggplotly(grafica_directv)
 
 ################################################################################
 
@@ -196,72 +188,91 @@ subplot(p1,p2,p3,p4,nrows = 2, margin = 0.07, titleX = T, titleY = T)
 
                                 #Predicciones
 
-################################################################################
-
 #Calculamos el componente estacional del uso de datos stl(). 
 #Hallamos el componente estacional de la serie mediante suavizado y 
 #ajusta la serie original restando la estacionalidad.
 
-#Prediccion movistar
+################################################################################
+
+                            #Prediccion movistar
+
 #Los datos atipicos mas observables se normalizaron (7, 24 y el 31 de diciembre)
 #por el promedio del dia anterior con el dia posterior.
-count_ma_movistar = ts(movistar$Trafico_Datos_Local, frequency=30)
-decomp_movistar = stl(count_ma_movistar, s.window="periodic")
-deseasonal <- seasadj(decomp_movistar)
-plot(decomp_movistar)
+ts_movistar = ts(movistar$Trafico_Datos_Local, start = c(2020,3,30),
+                      end = c(2021,1,26), frequency = 300)
+plot(ts_movistar)
+#decomp_movistar = stl(ts_movistar, s.window="periodic")
+#deseasonal <- seasadj(decomp_movistar)
+#plot(decomp_movistar)
 
-acf(movistar$Trafico_Datos_Local, prob = T, ylab = "", xlab = "", main = "")
-pacf(movistar$Trafico_Datos_Local, main='PACF for Differenced Series')
-modelo_arima_movistar <- auto.arima(movistar$Trafico_Datos_Local, seasonal=TRUE)
-tsdisplay(residuals(modelo_arima_movistar), lag.max=10, main='(2,0,0) Model Residuals')
-prediccion_movistar <- forecast(modelo_arima_movistar, h=30)
+ma_ts_movistar <- ma(ts_movistar,2)
+plot(ma_ts_movistar)
 
-#Prediccion claro
+acf(ts_movistar, prob = T, ylab = "", xlab = "", main = "")
+pacf(ts_movistar, main='PACF for Differenced Series')
+
+modelo_arima_movistar <- auto.arima(ma_ts_movistar)
+prediccion_movistar <- forecast(modelo_arima_movistar,10,level=95)
+Box.test(residuals(modelo_arima_movistar), type = 'Ljung-Box')
+plot(prediccion_movistar)
+mean(na.omit(residuals(modelo_arima_movistar)))
+
+################################################################################
+
+################################################################################
+                              #Prediccion claro
+
 #Los datos atipicos mas observables se normalizaron 
 #19 de mayo, 11 de junio, 27 de agosto(pico mayor), 13 y 30 de octubre
 #(7, 24 y el 31 de diciembre) por el promedio del dia anterior con el dia posterior.
-count_ma_claro = ts(claro$Trafico_Datos_Local, frequency=30)
-decomp_claro = stl(count_ma_claro, s.window="periodic")
-deseasonal <- seasadj(decomp_claro)
-plot(decomp_claro)
 
+ts_claro = ts(claro$Trafico_Datos_Local, start = c(2020,3,30),
+              end = c(2021,1,26), frequency=305)
+plot(ts_claro)
 
-acf(claro$Trafico_Datos_Local, prob = T, ylab = "", xlab = "", main = "")
-pacf(claro$Trafico_Datos_Local, main='PACF for Differenced Series')
-modelo_arima_claro <- auto.arima(claro$Trafico_Datos_Local, seasonal=TRUE)
-tsdisplay(residuals(modelo_arima_claro), lag.max=10, main='(2,0,0) Model Residuals')
-prediccion_claro <- forecast(modelo_arima_claro, h=30)
+ar <- Arima(ts_claro, order = c(3,2,2))
+prediccion_claro <- forecast(ar,12,level=95)
+Box.test(residuals(ar), type = 'Ljung-Box') ###p-value = 0.4485
+plot(prediccion_claro)
+mean(na.omit(residuals(ar)))
 
-#Prediccion unefon
-#Los datos atipicos mas observables se normalizaron (17, 24 y el 31 de diciembre)
-#por el promedio del dia anterior con el dia posterior.
-count_ma_unefon = ts(une$Trafico_Datos_Local, frequency=30)
-decomp_unefon = stl(count_ma_unefon, s.window="periodic")
-deseasonal <- seasadj(decomp_unefon)
-plot(decomp_unefon)
+################################################################################
 
+################################################################################
+                              #Prediccion unefon
 
-acf(une$Trafico_Datos_Local, prob = T, ylab = "", xlab = "", main = "")
-pacf(une$Trafico_Datos_Local, main='PACF for Differenced Series')
-modelo_arima_unefon <- auto.arima(une$Trafico_Datos_Local, seasonal=TRUE)
-tsdisplay(residuals(modelo_arima_unefon), lag.max=10, main='(2,0,0) Model Residuals')
-prediccion_unefon <- forecast(modelo_arima_unefon, h=30)
+#Los datos atipicos mas observables se normalizaron el 16 de noviembre y 
+#(17, 24, 27 y el 31 de diciembre) por el promedio del dia anterior con el 
+#dia posterior.
+ts_unefon = ts(une$Trafico_Datos_Local,start = c(2020,3,30),
+                     end = c(2021,1,26), frequency=305)
+
+modelo_arima_unefon <- auto.arima(ts_unefon)
+prediccion_unefon <- forecast(modelo_arima_unefon, 12, level=95)
+Box.test(residuals(modelo_arima_unefon), type = 'Ljung-Box')
+mean(na.omit(residuals(modelo_arima_unefon)))
+summary(modelo_arima_unefon)
+
+################################################################################
 
 #Prediccion directv
 #Prediccion claro
 #Los datos atipicos mas observables se normalizaron el 26 de octubre,
 #(31 de diciembre, 7 de enero por el promedio del dia anterior con el dia posterior.
-count_ma_directv = ts(directv$Trafico_Datos_Local, frequency=30)
-decomp_directv = stl(count_ma_directv, s.window="periodic")
-deseasonal <- seasadj(decomp_directv)
-plot(decomp_directv)
+ts_directv = ts(directv$Trafico_Datos_Local, start = c(2020,3,30),
+                end = c(2021,1,26), frequency=305)
+plot(ts_directv)
+#decomp_directv = stl(count_ma_directv, s.window="periodic")
+#deseasonal <- seasadj(decomp_directv)
+#plot(decomp_directv)
 
-
-acf(directv$Trafico_Datos_Local, prob = T, ylab = "", xlab = "", main = "")
-pacf(directv$Trafico_Datos_Local, main='PACF for Differenced Series')
-modelo_arima_directv <- auto.arima(directv$Trafico_Datos_Local, seasonal=TRUE)
-tsdisplay(residuals(modelo_arima_directv), lag.max=10, main='(2,0,0) Model Residuals')
-prediccion_directv <- forecast(modelo_arima_directv, h=20)
+#acf(directv$Trafico_Datos_Local, prob = T, ylab = "", xlab = "", main = "")
+#pacf(directv$Trafico_Datos_Local, main='PACF for Differenced Series')
+modelo_arima_directv <- auto.arima(ts_directv, seasonal=TRUE)
+#tsdisplay(residuals(modelo_arima_directv), lag.max=10, main='(2,0,0) Model Residuals')
+prediccion_directv <- forecast(modelo_arima_directv, 12, level=95)
+Box.test(residuals(modelo_arima_directv), type = 'Ljung-Box')
+mean(na.omit(residuals(modelo_arima_directv)))
 
 par(mfrow=c(2,2))
 plot(prediccion_movistar, main = "Movistar ARIMA", xlab="Tiempo", ylab = "Datos (GB)")
@@ -269,3 +280,4 @@ plot(prediccion_claro, main = "Clarovideo ARIMA", xlab="Tiempo", ylab = "Datos (
 plot(prediccion_unefon, main = "Unefon ARIMA", xlab="Tiempo", ylab = "Datos (GB)")
 plot(prediccion_directv, main = "Directv ARIMA", xlab="Tiempo", ylab = "Datos (GB)")
 ################################################################################
+
