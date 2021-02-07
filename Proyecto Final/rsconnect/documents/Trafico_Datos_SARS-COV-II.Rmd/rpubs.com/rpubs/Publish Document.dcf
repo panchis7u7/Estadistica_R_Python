@@ -1,0 +1,10 @@
+name: Publish Document
+title:
+username:
+account: rpubs
+server: rpubs.com
+hostUrl: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/722475/8f23a29d00eb42f2a19c8132a9cce475
+bundleId: https://api.rpubs.com/api/v1/document/722475/8f23a29d00eb42f2a19c8132a9cce475
+url: http://rpubs.com/Panchis/722475
+when: 1612688337.71029
